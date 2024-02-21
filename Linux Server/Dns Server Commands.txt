@@ -1,0 +1,52 @@
+Install DNS package
+	yum install bind bind-utils –y
+
+Configure DNS Server
+	vi /etc/named.conf
+	Edit the line
+	listen-on port 53 { 127.0.0.1; <Ip Address>; };
+
+Create Zone Files
+ 	cd /var/named
+	touch forward.lab
+	touch reverse.lab
+
+Modify the newly created Zone files – forward.lab file
+
+
+Modify the newly created Zone files – reverse.lab file
+
+
+
+Start the DNS server
+	systemctl start named
+	systemctl enable named
+
+open port 53 firewalld
+	sudo yum install firewalld -y 
+	sudo firewall-cmd --zone=public --add-port=53/tcp
+	sudo firewall-cmd --list-all
+
+Configuring Permissions, Ownership
+	chgrp named -R /var/named
+	chown -v root:named /etc/named.conf
+
+Test DNS configuration and zone files for any syntax errors
+
+	named-checkconf /etc/named.conf
+	named-checkzone lab.local /var/named/forward.lab
+ 	named-checkzone lab.local /var/named/reverse.lab
+
+Add DNS Server Information to network file
+ 	vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+	DNS=<IpAddress>
+
+Restart network service
+	systemctl restart network
+
+Modify /etc/resolv.conf
+ 	nameserver <Ip Address>
+
+Test DNS server
+	dig masterdns.lab.local
+	nslookup masterdns.lab.local
